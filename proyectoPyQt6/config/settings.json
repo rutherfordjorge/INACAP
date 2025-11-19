@@ -1,0 +1,7 @@
+{
+  "database": {
+    "user": "USUARIO_ORACLE",
+    "password": "PASSWORD_ORACLE",
+    "dsn": "HOST_HIGH"
+  }
+}
