@@ -45,6 +45,7 @@ class MainWindow(QMainWindow):
         table.setModel(self._model)
         table.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
         table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        table.setEditTriggers(QAbstractItemView.EditTrigger.AllEditTriggers)
         table.setAlternatingRowColors(True)
         table.horizontalHeader().setStretchLastSection(True)
         table.setItemDelegateForColumn(ClienteTableModel.ACTION_COLUMN, self._detail_delegate)
