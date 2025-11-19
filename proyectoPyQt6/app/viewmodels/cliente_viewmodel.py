@@ -1,7 +1,7 @@
 """ViewModel for Cliente listing."""
 from __future__ import annotations
 
-from typing import List
+from typing import List, Sequence
 
 from PyQt6.QtCore import QObject, pyqtSignal
 
@@ -28,6 +28,28 @@ class ClienteViewModel(QObject):
             self.clientes_changed.emit(self._clientes)
         except Exception as exc:  # pragma: no cover - interacts with DB
             self.error_occurred.emit(str(exc))
+
+    def add_cliente(self, cliente: Cliente) -> bool:
+        """Persist a new client and refresh cache."""
+
+        try:
+            self._repository.add(cliente)
+            self.load_clientes()
+            return True
+        except Exception as exc:  # pragma: no cover - interacts with DB
+            self.error_occurred.emit(str(exc))
+            return False
+
+    def delete_clientes(self, cliente_ids: Sequence[int]) -> bool:
+        """Delete multiple clients and refresh cache."""
+
+        try:
+            self._repository.delete_many(cliente_ids)
+            self.load_clientes()
+            return True
+        except Exception as exc:  # pragma: no cover - interacts with DB
+            self.error_occurred.emit(str(exc))
+            return False
 
     @property
     def clientes(self) -> List[Cliente]:

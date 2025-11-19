@@ -1,7 +1,7 @@
 """Repository layer for Cliente entity."""
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+from typing import Iterable, List, Optional, Sequence
 
 import oracledb
 
@@ -33,41 +33,39 @@ class ClienteRepository:
     def get_by_id(self, cliente_id: int) -> Optional[Cliente]:
         """Return a client by its identifier."""
 
-        query = (
-            "SELECT ID, RUT, DV, NOMBRE, APELLIDO, FECHA_NAC, EMAIL, TELEFONO, DIRECCION, "
-            "ESTADO_CLIENTE, LIMITE_CREDITO FROM CLIENTE WHERE ID = :id"
-        )
         with self._connection_factory.get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute(query, id=cliente_id)
-                row = cursor.fetchone()
+                result_cursor_var = cursor.var(oracledb.DB_TYPE_CURSOR)
+                cursor.callproc("SP_GET_CLIENTE_BY_ID", [cliente_id, result_cursor_var])
+                result_cursor = result_cursor_var.getvalue()
+                try:
+                    row = result_cursor.fetchone()
+                finally:
+                    result_cursor.close()
 
         return self._map_row(row) if row else None
 
     def add(self, cliente: Cliente) -> int:
         """Insert a new client and return its generated ID."""
 
-        query = (
-            "INSERT INTO CLIENTE (RUT, DV, NOMBRE, APELLIDO, FECHA_NAC, EMAIL, TELEFONO, DIRECCION, ESTADO_CLIENTE, LIMITE_CREDITO) "
-            "VALUES (:rut, :dv, :nombre, :apellido, :fecha_nac, :email, :telefono, :direccion, :estado_cliente, :limite_credito) "
-            "RETURNING ID INTO :id"
-        )
         with self._connection_factory.get_connection() as conn:
             with conn.cursor() as cursor:
                 id_var = cursor.var(int)
-                cursor.execute(
-                    query,
-                    rut=cliente.rut,
-                    dv=cliente.dv,
-                    nombre=cliente.nombre,
-                    apellido=cliente.apellido,
-                    fecha_nac=cliente.fecha_nac,
-                    email=cliente.email,
-                    telefono=cliente.telefono,
-                    direccion=cliente.direccion,
-                    estado_cliente=cliente.estado_cliente,
-                    limite_credito=cliente.limite_credito,
-                    id=id_var,
+                cursor.callproc(
+                    "SP_INSERT_CLIENTE",
+                    [
+                        cliente.rut,
+                        cliente.dv,
+                        cliente.nombre,
+                        cliente.apellido,
+                        cliente.fecha_nac,
+                        cliente.email,
+                        cliente.telefono,
+                        cliente.direccion,
+                        cliente.estado_cliente,
+                        cliente.limite_credito,
+                        id_var,
+                    ],
                 )
                 conn.commit()
                 return int(id_var.getvalue())
@@ -78,35 +76,42 @@ class ClienteRepository:
         if cliente.id is None:
             raise ValueError("El cliente debe tener ID para ser actualizado")
 
-        query = (
-            "UPDATE CLIENTE SET RUT=:rut, DV=:dv, NOMBRE=:nombre, APELLIDO=:apellido, FECHA_NAC=:fecha_nac, "
-            "EMAIL=:email, TELEFONO=:telefono, DIRECCION=:direccion, ESTADO_CLIENTE=:estado_cliente, LIMITE_CREDITO=:limite_credito "
-            "WHERE ID=:id"
-        )
         with self._connection_factory.get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute(
-                    query,
-                    id=cliente.id,
-                    rut=cliente.rut,
-                    dv=cliente.dv,
-                    nombre=cliente.nombre,
-                    apellido=cliente.apellido,
-                    fecha_nac=cliente.fecha_nac,
-                    email=cliente.email,
-                    telefono=cliente.telefono,
-                    direccion=cliente.direccion,
-                    estado_cliente=cliente.estado_cliente,
-                    limite_credito=cliente.limite_credito,
+                cursor.callproc(
+                    "SP_UPDATE_CLIENTE",
+                    [
+                        cliente.id,
+                        cliente.rut,
+                        cliente.dv,
+                        cliente.nombre,
+                        cliente.apellido,
+                        cliente.fecha_nac,
+                        cliente.email,
+                        cliente.telefono,
+                        cliente.direccion,
+                        cliente.estado_cliente,
+                        cliente.limite_credito,
+                    ],
                 )
                 conn.commit()
 
     def delete(self, cliente_id: int) -> None:
-        """Delete a client by ID."""
+        """Delete a single client by ID using a stored procedure."""
+
+        self.delete_many([cliente_id])
+
+    def delete_many(self, cliente_ids: Iterable[int]) -> None:
+        """Delete several clients via stored procedure."""
+
+        ids = [cid for cid in cliente_ids if cid is not None]
+        if not ids:
+            return
 
         with self._connection_factory.get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("DELETE FROM CLIENTE WHERE ID = :id", id=cliente_id)
+                for cliente_id in ids:
+                    cursor.callproc("SP_DELETE_CLIENTE", [cliente_id])
                 conn.commit()
 
     @staticmethod

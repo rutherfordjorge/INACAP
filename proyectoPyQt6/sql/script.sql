@@ -58,3 +58,140 @@ INSERT INTO CLIENTE (RUT, DV, NOMBRE, APELLIDO, FECHA_NAC, EMAIL, TELEFONO, DIRE
 
 INSERT INTO CLIENTE (RUT, DV, NOMBRE, APELLIDO, FECHA_NAC, EMAIL, TELEFONO, DIRECCION, ESTADO_CLIENTE, LIMITE_CREDITO) VALUES
 ('24681357', '2', 'Daniela', 'Salinas', DATE '1997-07-12', 'daniela.salinas@example.com', '923498761', 'Av. Kennedy 4500', 'A', 1950000.00);
+
+CREATE OR REPLACE PROCEDURE SP_GET_CLIENTES (
+    P_CURSOR OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+    OPEN P_CURSOR FOR
+        SELECT ID,
+               RUT,
+               DV,
+               NOMBRE,
+               APELLIDO,
+               FECHA_NAC,
+               EMAIL,
+               TELEFONO,
+               DIRECCION,
+               ESTADO_CLIENTE,
+               LIMITE_CREDITO
+        FROM CLIENTE
+        ORDER BY ID;
+END SP_GET_CLIENTES;
+/
+
+CREATE OR REPLACE PROCEDURE SP_GET_CLIENTE_BY_ID (
+    P_ID     IN  NUMBER,
+    P_CURSOR OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+    OPEN P_CURSOR FOR
+        SELECT ID,
+               RUT,
+               DV,
+               NOMBRE,
+               APELLIDO,
+               FECHA_NAC,
+               EMAIL,
+               TELEFONO,
+               DIRECCION,
+               ESTADO_CLIENTE,
+               LIMITE_CREDITO
+        FROM CLIENTE
+        WHERE ID = P_ID;
+END SP_GET_CLIENTE_BY_ID;
+/
+
+CREATE OR REPLACE PROCEDURE SP_GET_CLIENTE_BY_RUT (
+    P_RUT     IN  NUMBER,
+    P_CURSOR OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+    OPEN P_CURSOR FOR
+        SELECT ID,
+               RUT,
+               DV,
+               NOMBRE,
+               APELLIDO,
+               FECHA_NAC,
+               EMAIL,
+               TELEFONO,
+               DIRECCION,
+               ESTADO_CLIENTE,
+               LIMITE_CREDITO
+        FROM CLIENTE
+        WHERE RUT = P_RUT;
+END SP_GET_CLIENTE_BY_RUT;
+/
+
+CREATE OR REPLACE PROCEDURE SP_INSERT_CLIENTE (
+    P_RUT            IN VARCHAR2,
+    P_DV             IN CHAR,
+    P_NOMBRE         IN VARCHAR2,
+    P_APELLIDO       IN VARCHAR2,
+    P_FECHA_NAC      IN DATE,
+    P_EMAIL          IN VARCHAR2,
+    P_TELEFONO       IN VARCHAR2,
+    P_DIRECCION      IN VARCHAR2,
+    P_ESTADO_CLIENTE IN CHAR,
+    P_LIMITE_CREDITO IN NUMBER,
+    P_NEW_ID         OUT NUMBER
+)
+AS
+BEGIN
+    INSERT INTO CLIENTE (
+        RUT, DV, NOMBRE, APELLIDO, FECHA_NAC,
+        EMAIL, TELEFONO, DIRECCION, ESTADO_CLIENTE, LIMITE_CREDITO
+    ) VALUES (
+        P_RUT, P_DV, P_NOMBRE, P_APELLIDO, P_FECHA_NAC,
+        P_EMAIL, P_TELEFONO, P_DIRECCION, P_ESTADO_CLIENTE, P_LIMITE_CREDITO
+    )
+    RETURNING ID INTO P_NEW_ID;
+END SP_INSERT_CLIENTE;
+/
+
+CREATE OR REPLACE PROCEDURE SP_UPDATE_CLIENTE (
+    P_ID             IN NUMBER,
+    P_RUT            IN VARCHAR2,
+    P_DV             IN CHAR,
+    P_NOMBRE         IN VARCHAR2,
+    P_APELLIDO       IN VARCHAR2,
+    P_FECHA_NAC      IN DATE,
+    P_EMAIL          IN VARCHAR2,
+    P_TELEFONO       IN VARCHAR2,
+    P_DIRECCION      IN VARCHAR2,
+    P_ESTADO_CLIENTE IN CHAR,
+    P_LIMITE_CREDITO IN NUMBER
+)
+AS
+BEGIN
+    UPDATE CLIENTE
+    SET RUT            = P_RUT,
+        DV             = P_DV,
+        NOMBRE         = P_NOMBRE,
+        APELLIDO       = P_APELLIDO,
+        FECHA_NAC      = P_FECHA_NAC,
+        EMAIL          = P_EMAIL,
+        TELEFONO       = P_TELEFONO,
+        DIRECCION      = P_DIRECCION,
+        ESTADO_CLIENTE = P_ESTADO_CLIENTE,
+        LIMITE_CREDITO = P_LIMITE_CREDITO
+    WHERE ID = P_ID;
+END SP_UPDATE_CLIENTE;
+/
+
+
+
+
+
+CREATE OR REPLACE PROCEDURE SP_DELETE_CLIENTE (
+    P_ID IN NUMBER
+)
+AS
+BEGIN
+    DELETE FROM CLIENTE WHERE ID = P_ID;
+END SP_DELETE_CLIENTE;
+/
