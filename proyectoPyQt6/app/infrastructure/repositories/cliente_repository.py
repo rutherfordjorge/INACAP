@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import List, Optional, Sequence
 
+import oracledb
+
 from app.domain.models.cliente import Cliente
 from app.infrastructure.database.oracle_connection import OracleConnection
 
@@ -16,14 +18,15 @@ class ClienteRepository:
     def get_all(self) -> List[Cliente]:
         """Retrieve every client from the database."""
 
-        query = (
-            "SELECT ID, RUT, DV, NOMBRE, APELLIDO, FECHA_NAC, EMAIL, TELEFONO, DIRECCION, "
-            "ESTADO_CLIENTE, LIMITE_CREDITO FROM CLIENTE"
-        )
         with self._connection_factory.get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute(query)
-                rows = cursor.fetchall()
+                result_cursor_var = cursor.var(oracledb.DB_TYPE_CURSOR)
+                cursor.callproc("SP_GET_CLIENTES", [result_cursor_var])
+                result_cursor = result_cursor_var.getvalue()
+                try:
+                    rows = result_cursor.fetchall()
+                finally:
+                    result_cursor.close()
 
         return [self._map_row(row) for row in rows]
 
