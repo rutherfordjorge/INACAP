@@ -77,6 +77,7 @@ class ClienteTableModel(QAbstractTableModel):
         if index.column() == self.SELECT_COLUMN:
             return (
                 Qt.ItemFlag.ItemIsEnabled
+                | Qt.ItemFlag.ItemIsEditable
                 | Qt.ItemFlag.ItemIsUserCheckable
                 | Qt.ItemFlag.ItemIsSelectable
             )
@@ -87,14 +88,15 @@ class ClienteTableModel(QAbstractTableModel):
     def setData(self, index: QModelIndex, value: QVariant, role: int = Qt.ItemDataRole.EditRole) -> bool:  # noqa: N802
         if not index.isValid() or index.column() != self.SELECT_COLUMN:
             return False
-        if role != Qt.ItemDataRole.CheckStateRole:
+        if role not in (Qt.ItemDataRole.CheckStateRole, Qt.ItemDataRole.EditRole):
             return False
 
         cliente = self._clientes[index.row()]
         if cliente.id is None:
             return False
 
-        if value == Qt.CheckState.Checked:
+        state = Qt.CheckState(value)
+        if state == Qt.CheckState.Checked:
             self._selected_ids.add(cliente.id)
         else:
             self._selected_ids.discard(cliente.id)
