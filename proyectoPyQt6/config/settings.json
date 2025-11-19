@@ -1,9 +1,9 @@
 {
   "database": {
-    "user": "admin",
-    "password": "Verano2025Cool.",
-    "dsn": "jrk202502_medium",
-    "wallet_dir": "Wallet",
-    "wallet_password": "Verano2025Cool"
+    "user": "",
+    "password": ".",
+    "dsn": "",
+    "wallet_dir": "",
+    "wallet_password": ""
   }
 }
