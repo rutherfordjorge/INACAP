@@ -1,9 +1,9 @@
 {
   "database": {
-    "user": "",
-    "password": ".",
-    "dsn": "",
-    "wallet_dir": "",
-    "wallet_password": ""
+    "user": "admin",
+    "password": "Verano2025Cool.",
+    "dsn": "jrk202502_medium",
+    "wallet_dir": "C:\\Desarrollos\\Personales\\GITINACAP\\INACAP\\proyectoPyQt6\\Wallet",
+    "wallet_password": "Verano2025Cool"
   }
 }

@@ -1,0 +1,9 @@
+{
+  "database": {
+    "user": "",
+    "password": "",
+    "dsn": "",
+    "wallet_dir": "",
+    "wallet_password": ""
+  }
+}
