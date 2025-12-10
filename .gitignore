@@ -1,0 +1,4 @@
+# Exclude sensitive Oracle wallet artifacts
+nuevqCarpera/Wallet/*
+!nuevqCarpera/Wallet/README
+!nuevqCarpera/Wallet/.gitkeep

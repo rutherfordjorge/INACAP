@@ -1,0 +1,9 @@
+{
+  "database": {
+    "user": "TU_USUARIO",
+    "password": "TU_PASSWORD",
+    "dsn": "TU_DSN_AUTONOMOUS",
+    "wallet_dir": null,
+    "wallet_password": null
+  }
+}

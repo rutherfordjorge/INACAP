@@ -1,0 +1,13 @@
+# Wallet de Oracle (no incluido)
+
+Los archivos del wallet de Oracle Autonomous Database no se incluyen en el repositorio para evitar subir binarios y credenciales sensibles.
+
+## Cómo obtener el wallet
+1. Descarga el wallet desde tu instancia de Autonomous Database (botón *DB Connection* > *Download Wallet*).
+2. Extrae el contenido del ZIP en una carpeta local.
+3. Actualiza `config/settings.json` con la ruta absoluta de esa carpeta en la llave `wallet_dir` y, si corresponde, `wallet_password`.
+
+## Buenas prácticas
+- No subas el contenido del wallet al control de versiones.
+- Al compartir el proyecto, entrega sólo esta carpeta vacía y el archivo `.gitkeep`.
+- Revisa `.gitignore` para confirmar que los artefactos del wallet siguen excluidos.
